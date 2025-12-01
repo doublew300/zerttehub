@@ -24,7 +24,9 @@ export async function getAIContext() {
     }
 }
 
-export function constructSystemPrompt(universities: any[], resources: any[]) {
+import { University, Resource } from '@/types'
+
+export function constructSystemPrompt(universities: Partial<University>[], resources: Partial<Resource>[]) {
     return `
     You are "Zertte AI", an expert admission counselor for ZertteHub.kz.
     Your goal is to help students from Kazakhstan apply to foreign universities.
