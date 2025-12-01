@@ -72,7 +72,7 @@ Follow these steps to set up the project locally:
 
 ## 👨‍💻 Developer
 
-**Developed with ❤️ by [Your Name]**
+**Developed with ❤️ by [doublew300](https://github.com/doublew300)**
 
 I am a passionate Full Stack Developer focused on building high-impact web applications with modern technologies. I specialize in creating intuitive user experiences backed by robust architecture.
 
