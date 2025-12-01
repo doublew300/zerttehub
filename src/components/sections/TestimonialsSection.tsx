@@ -92,7 +92,7 @@ export default function TestimonialsSection() {
 
                                 {/* Text */}
                                 <p className="text-gray-300 leading-relaxed mb-6 relative z-10 text-sm">
-                                    "{item.text}"
+                                    &quot;{item.text}&quot;
                                 </p>
 
                                 {/* Tags */}

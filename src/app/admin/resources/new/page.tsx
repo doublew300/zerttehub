@@ -24,26 +24,25 @@ export default function NewResourcePage() {
     const router = useRouter()
 
     useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) {
+                router.push('/auth')
+                return
+            }
+
+            const { data: profile } = await supabase
+                .from('users')
+                .select('role')
+                .eq('id', user.id)
+                .single()
+
+            if (profile?.role !== 'admin') {
+                router.push('/dashboard')
+            }
+        }
         checkAdmin()
-    }, [])
-
-    const checkAdmin = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) {
-            router.push('/auth')
-            return
-        }
-
-        const { data: profile } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', user.id)
-            .single()
-
-        if (profile?.role !== 'admin') {
-            router.push('/dashboard')
-        }
-    }
+    }, [supabase, router])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -196,7 +195,7 @@ export default function NewResourcePage() {
                                     className="w-5 h-5 rounded border-gray-600 text-blue-600 focus:ring-blue-500 bg-gray-700"
                                 />
                                 <label htmlFor="is_new" className="text-sm font-medium text-white cursor-pointer select-none">
-                                    Метка "NEW"
+                                    Метка &quot;NEW&quot;
                                 </label>
                             </div>
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Globe, GraduationCap, Search, ChevronDown } from 'lucide-react'
 import Quiz from '@/components/Quiz'
 
@@ -28,10 +29,12 @@ export default function HeroSection() {
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-950/90 via-blue-900/80 to-blue-800/90 z-10 mix-blend-multiply"></div>
                 {/* Header Protection Gradient */}
                 <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-black/80 via-black/40 to-transparent z-20"></div>
-                <img
+                <Image
                     src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2000&auto=format&fit=crop"
                     alt="University Campus"
-                    className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-20"
+                    fill
+                    className="object-cover mix-blend-overlay opacity-20"
+                    priority
                 />
                 {/* Grain Texture Overlay */}
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 z-10 mix-blend-soft-light"></div>

@@ -9,6 +9,7 @@ import { useParams } from 'next/navigation'
 
 export default function EditUniversityPage() {
     const params = useParams()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [university, setUniversity] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const supabase = createClient()
@@ -27,7 +28,7 @@ export default function EditUniversityPage() {
             setLoading(false)
         }
         fetchUniversity()
-    }, [params.id])
+    }, [params.id, supabase])
 
     if (loading) {
         return (

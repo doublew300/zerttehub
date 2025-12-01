@@ -1,14 +1,27 @@
 'use client'
 
-import { type UIMessage as Message } from 'ai'
 import { useChat } from '@ai-sdk/react'
 import { useState, useRef, useEffect } from 'react'
-import { MessageCircle, X, Send, Sparkles, Bot, User } from 'lucide-react'
+import { MessageCircle, X, Send, Sparkles, Bot } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+
+interface UIMessage {
+    id: string
+    role: string
+    content: string
+}
+
+interface ChatHelpers {
+    messages: UIMessage[]
+    input: string
+    handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void
+    isLoading: boolean
+}
 
 export default function ChatWidget() {
     const [isOpen, setIsOpen] = useState(false)
-    const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat() as any
+    const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat() as unknown as ChatHelpers
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
     const scrollToBottom = () => {
@@ -63,7 +76,7 @@ export default function ChatWidget() {
                                 </div>
                             )}
 
-                            {messages.map((m: any) => (
+                            {messages.map((m) => (
                                 <div
                                     key={m.id}
                                     className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}

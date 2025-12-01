@@ -1,4 +1,5 @@
 import { Mail, MapPin, Phone, Send } from 'lucide-react'
+import Link from 'next/link'
 
 export default function ContactsPage() {
     return (
@@ -53,9 +54,9 @@ export default function ContactsPage() {
                         <p className="text-gray-400 mb-4">
                             Прежде чем писать, посмотрите наш раздел FAQ. Возможно, ответ уже там!
                         </p>
-                        <a href="/#faq" className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-2">
+                        <Link href="/#faq" className="text-blue-400 hover:text-blue-300 font-medium flex items-center gap-2">
                             Перейти к FAQ <ArrowRight className="w-4 h-4" />
-                        </a>
+                        </Link>
                     </div>
                 </div>
 

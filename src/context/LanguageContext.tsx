@@ -44,7 +44,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const saved = localStorage.getItem('language') as Language
-        if (saved) setLanguage(saved)
+        if (saved) {
+            setTimeout(() => setLanguage(saved), 0)
+        }
     }, [])
 
     const handleSetLanguage = (lang: Language) => {
@@ -53,7 +55,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
 
     const t = (key: string) => {
-        // @ts-ignore
+        // @ts-expect-error - dynamic key access
         return translations[language][key] || key
     }
 

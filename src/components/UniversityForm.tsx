@@ -5,8 +5,10 @@ import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 
+import { University } from '@/types'
+
 interface UniversityFormProps {
-    initialData?: any
+    initialData?: University
     isEdit?: boolean
 }
 
@@ -16,7 +18,7 @@ export default function UniversityForm({ initialData, isEdit = false }: Universi
         country: initialData?.country || '',
         city: initialData?.city || '',
         cost_description: initialData?.cost_description || '',
-        ielts_score: initialData?.ielts_score || '',
+        ielts_score: initialData?.ielts_score?.toString() || '',
         flag_emoji: initialData?.flag_emoji || '',
         slug: initialData?.slug || '',
         scholarship_info: initialData?.scholarship_info || '',
@@ -53,7 +55,7 @@ export default function UniversityForm({ initialData, isEdit = false }: Universi
         }
 
         try {
-            if (isEdit) {
+            if (isEdit && initialData) {
                 const { error } = await supabase
                     .from('universities')
                     .update(universityData)

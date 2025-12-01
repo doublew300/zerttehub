@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { MapPin, ArrowRight, Plus, Check } from 'lucide-react'
 import { UNIVERSITY_IMAGES } from '@/lib/universityImages'
 import { useState } from 'react'
@@ -85,12 +86,13 @@ export default function UniversityCard({ university }: UniversityProps) {
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/10 hover:border-blue-500/50 overflow-hidden h-full flex flex-col transform hover:-translate-y-2 relative group-hover:bg-white/10">
                 {/* Image Placeholder */}
                 <div className="relative h-48 bg-gray-900 overflow-hidden">
-                    <img
+                    <Image
                         src={imgError ? fallbackImage : imageUrl}
                         alt={`${university.name} campus`}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
-                        loading="lazy"
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                         onError={() => setImgError(true)}
+                        unoptimized={imgError} // Fallback might need unoptimized if external
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
 
@@ -110,10 +112,11 @@ export default function UniversityCard({ university }: UniversityProps) {
                     <div className="flex items-center text-gray-400 text-sm">
                         <MapPin className="w-4 h-4 mr-2 text-gray-500" />
                         {university.city}, {university.country}
-                        <img
+                        <Image
                             src={`https://flagcdn.com/w40/${countryCode}.png`}
-                            srcSet={`https://flagcdn.com/w80/${countryCode}.png 2x`}
                             alt={university.country}
+                            width={20}
+                            height={15}
                             className="ml-2 w-5 h-auto rounded-sm shadow-sm"
                         />
                     </div>

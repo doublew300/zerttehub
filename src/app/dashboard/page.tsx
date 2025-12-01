@@ -1,14 +1,17 @@
+
 'use client'
 
 import { useState, useEffect } from 'react'
-import { CheckSquare, Square, Download, LogOut, Loader2, Lock, ArrowRight } from 'lucide-react'
+import { CheckSquare, Download, LogOut, Loader2, Lock, ArrowRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import KanbanBoard from '@/components/KanbanBoard'
 
-const initialSteps = [
+import { UserProfile, University, Step } from '@/types'
+
+const initialSteps: Step[] = [
     { id: 1, text: 'Выбрать страну и вуз', completed: false, link: '/universities', cta: 'Открыть каталог' },
     { id: 2, text: 'Сдать IELTS (минимум 6.0)', completed: false, link: '/checklists', cta: 'Материалы для подготовки' },
     { id: 3, text: 'Собрать документы (аттестат, справки)', completed: false, link: '/checklists', cta: 'Шаблоны документов' },
@@ -19,10 +22,10 @@ const initialSteps = [
 ]
 
 export default function Dashboard() {
-    const [steps, setSteps] = useState(initialSteps)
+    const [steps, setSteps] = useState<Step[]>(initialSteps)
     const [loading, setLoading] = useState(true)
-    const [profile, setProfile] = useState<any>(null)
-    const [recommendedUnis, setRecommendedUnis] = useState<any[]>([])
+    const [profile, setProfile] = useState<UserProfile | null>(null)
+    const [recommendedUnis, setRecommendedUnis] = useState<University[]>([])
     const [activeTab, setActiveTab] = useState<'roadmap' | 'applications'>('roadmap')
     const router = useRouter()
     const supabase = createClient()
@@ -42,11 +45,12 @@ export default function Dashboard() {
                 .single()
 
             // Merge auth data with profile data
-            const mergedProfile = {
+            const mergedProfile: UserProfile = {
                 ...profileData,
                 email: user.email, // Always use auth email as primary
                 full_name: profileData?.full_name || user.user_metadata?.full_name,
-                id: user.id
+                id: user.id,
+                is_premium: profileData?.is_premium || false
             }
 
             setProfile(mergedProfile)
@@ -55,7 +59,7 @@ export default function Dashboard() {
                 // Merge saved progress with initial steps structure to keep links
                 const savedSteps = profileData.progress.steps
                 const mergedSteps = initialSteps.map(initialStep => {
-                    const savedStep = savedSteps.find((s: any) => s.id === initialStep.id)
+                    const savedStep = savedSteps.find((s: Step) => s.id === initialStep.id)
                     return savedStep ? { ...initialStep, completed: savedStep.completed } : initialStep
                 })
                 setSteps(mergedSteps)
@@ -64,7 +68,7 @@ export default function Dashboard() {
             // Fetch Recommendations based on Quiz Results
             const quizResults = localStorage.getItem('quiz_results')
             if (quizResults) {
-                const answers = JSON.parse(quizResults)
+                const answers: string[] = JSON.parse(quizResults)
 
                 // 1. Parse User Preferences
                 // Q1: English Level -> Max IELTS
@@ -91,12 +95,12 @@ export default function Dashboard() {
 
                 if (allUnis) {
                     // 3. Scoring Algorithm
-                    const scoredUnis = allUnis.map((uni: any) => {
+                    const scoredUnis = allUnis.map((uni: University) => {
                         let score = 0
                         const reasons: string[] = []
 
                         // Criteria A: IELTS (Critical)
-                        if (uni.ielts_score <= userIelts) {
+                        if ((uni.ielts_score || 0) <= userIelts) {
                             score += 30
                             reasons.push('✅ Проходишь по IELTS')
                         } else {
@@ -140,7 +144,7 @@ export default function Dashboard() {
 
                     // 4. Sort and Pick Top 3
                     const topMatches = scoredUnis
-                        .sort((a, b) => b.score - a.score)
+                        .sort((a, b) => (b.score || 0) - (a.score || 0))
                         .slice(0, 3)
 
                     setRecommendedUnis(topMatches)
@@ -148,7 +152,7 @@ export default function Dashboard() {
             } else {
                 // Fallback: Random popular ones
                 const { data: recs } = await supabase.from('universities').select('*').limit(3)
-                if (recs) setRecommendedUnis(recs)
+                if (recs) setRecommendedUnis(recs as University[])
             }
 
             setLoading(false)

@@ -5,10 +5,12 @@ import { FileText, Lock, Download, Loader2, CheckCircle, GraduationCap, Plane, B
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 
+import { Resource } from '@/types'
+
 const CATEGORIES = ['Все', 'Бесплатно', 'Документы', 'Виза', 'Гранты', 'IELTS']
 
 export default function ChecklistsPage() {
-    const [resources, setResources] = useState<any[]>([])
+    const [resources, setResources] = useState<Resource[]>([])
     const [activeCategory, setActiveCategory] = useState('Все')
     const [searchQuery, setSearchQuery] = useState('')
     const [isPremium, setIsPremium] = useState(false)
@@ -36,7 +38,7 @@ export default function ChecklistsPage() {
                     .order('is_new', { ascending: false })
 
                 if (error) throw error
-                setResources(resourcesData || [])
+                setResources(resourcesData as Resource[] || [])
 
             } catch (e) {
                 console.error(e)
@@ -57,7 +59,7 @@ export default function ChecklistsPage() {
     })
 
     // Handle Download
-    const handleDownload = async (resource: any) => {
+    const handleDownload = async (resource: Resource) => {
         try {
             let downloadUrl = resource.file_url
 
@@ -88,9 +90,10 @@ export default function ChecklistsPage() {
             // Optional: Increment download count
             await supabase.rpc('increment_downloads', { resource_id: resource.id })
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Download error:', error)
-            alert(`Ошибка: ${error.message}. Путь: ${resource.file_url}`)
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+            alert(`Ошибка: ${errorMessage}. Путь: ${resource.file_url}`)
         }
     }
 

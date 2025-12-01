@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Search, Loader2, User, Shield, CheckCircle, XCircle } from 'lucide-react'
+import { ArrowLeft, Search, Loader2, User, CheckCircle, XCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export default function AdminUsersPage() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [users, setUsers] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
@@ -15,39 +16,39 @@ export default function AdminUsersPage() {
     const router = useRouter()
 
     useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) {
+                router.push('/auth')
+                return
+            }
+
+            const { data: profile } = await supabase
+                .from('users')
+                .select('role')
+                .eq('id', user.id)
+                .single()
+
+            if (profile?.role !== 'admin') {
+                router.push('/dashboard')
+            }
+        }
+
+        const fetchData = async () => {
+            const { data } = await supabase
+                .from('users')
+                .select('*')
+                .order('created_at', { ascending: false })
+
+            if (data) {
+                setUsers(data)
+            }
+            setLoading(false)
+        }
+
         checkAdmin()
         fetchData()
-    }, [])
-
-    const checkAdmin = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) {
-            router.push('/auth')
-            return
-        }
-
-        const { data: profile } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', user.id)
-            .single()
-
-        if (profile?.role !== 'admin') {
-            router.push('/dashboard')
-        }
-    }
-
-    const fetchData = async () => {
-        const { data } = await supabase
-            .from('users')
-            .select('*')
-            .order('created_at', { ascending: false })
-
-        if (data) {
-            setUsers(data)
-        }
-        setLoading(false)
-    }
+    }, [supabase, router])
 
     const togglePremium = async (userId: string, currentStatus: boolean) => {
         const { error } = await supabase
@@ -156,8 +157,8 @@ export default function AdminUsersPage() {
                                                 <button
                                                     onClick={() => togglePremium(user.id, user.is_premium)}
                                                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${user.is_premium
-                                                            ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20'
-                                                            : 'bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20'
+                                                        ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20'
+                                                        : 'bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20'
                                                         }`}
                                                 >
                                                     {user.is_premium ? 'Снять Premium' : 'Выдать Premium'}

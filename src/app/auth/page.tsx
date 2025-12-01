@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
-import { Loader2, ArrowRight } from 'lucide-react'
-import Link from 'next/link'
+import { Loader2 } from 'lucide-react'
 
 export default function AuthPage() {
     const [email, setEmail] = useState('')
@@ -42,8 +41,12 @@ export default function AuthPage() {
                 router.push('/dashboard')
                 router.refresh()
             }
-        } catch (err: any) {
-            setError(err.message)
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message)
+            } else {
+                setError('An unexpected error occurred')
+            }
         } finally {
             setIsLoading(false)
         }

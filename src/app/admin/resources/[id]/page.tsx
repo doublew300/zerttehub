@@ -26,44 +26,44 @@ export default function EditResourcePage() {
     const params = useParams()
 
     useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) {
+                router.push('/auth')
+                return
+            }
+
+            const { data: profile } = await supabase
+                .from('users')
+                .select('role')
+                .eq('id', user.id)
+                .single()
+
+            if (profile?.role !== 'admin') {
+                router.push('/dashboard')
+            }
+        }
+
+        const fetchResource = async () => {
+            const { data, error } = await supabase
+                .from('resources')
+                .select('*')
+                .eq('id', params.id)
+                .single()
+
+            if (error) {
+                console.error(error)
+                toast.error('Ошибка при загрузке')
+                router.push('/admin/resources')
+            } else if (data) {
+                setFormData(data)
+                setLoading(false)
+            }
+        }
+
         checkAdmin()
         fetchResource()
-    }, [])
-
-    const checkAdmin = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) {
-            router.push('/auth')
-            return
-        }
-
-        const { data: profile } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', user.id)
-            .single()
-
-        if (profile?.role !== 'admin') {
-            router.push('/dashboard')
-        }
-    }
-
-    const fetchResource = async () => {
-        const { data, error } = await supabase
-            .from('resources')
-            .select('*')
-            .eq('id', params.id)
-            .single()
-
-        if (error) {
-            console.error(error)
-            toast.error('Ошибка при загрузке')
-            router.push('/admin/resources')
-        } else if (data) {
-            setFormData(data)
-            setLoading(false)
-        }
-    }
+    }, [supabase, router, params.id])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -219,7 +219,7 @@ export default function EditResourcePage() {
                                     className="w-5 h-5 rounded border-gray-600 text-blue-600 focus:ring-blue-500 bg-gray-700"
                                 />
                                 <label htmlFor="is_new" className="text-sm font-medium text-white cursor-pointer select-none">
-                                    Метка "NEW"
+                                    Метка &quot;NEW&quot;
                                 </label>
                             </div>
 

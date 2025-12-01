@@ -28,38 +28,37 @@ export default function EditUniversityPage({ params }: { params: Promise<{ id: s
     const router = useRouter()
 
     useEffect(() => {
+        const fetchUniversity = async () => {
+            const { data: uni, error } = await supabase
+                .from('universities')
+                .select('*')
+                .eq('id', id)
+                .single()
+
+            if (error) {
+                alert('Ошибка загрузки')
+                router.push('/admin')
+                return
+            }
+
+            if (uni) {
+                setFormData({
+                    name: uni.name,
+                    country: uni.country,
+                    city: uni.city,
+                    slug: uni.slug,
+                    cost_description: uni.cost_description || '',
+                    ielts_score: uni.ielts_score?.toString() || '',
+                    flag_emoji: uni.flag_emoji || '',
+                    scholarship_info: uni.scholarship_info || '',
+                    description: uni.details_json?.description || '',
+                    website: uni.details_json?.website || ''
+                })
+            }
+            setLoading(false)
+        }
         fetchUniversity()
-    }, [])
-
-    const fetchUniversity = async () => {
-        const { data: uni, error } = await supabase
-            .from('universities')
-            .select('*')
-            .eq('id', id)
-            .single()
-
-        if (error) {
-            alert('Ошибка загрузки')
-            router.push('/admin')
-            return
-        }
-
-        if (uni) {
-            setFormData({
-                name: uni.name,
-                country: uni.country,
-                city: uni.city,
-                slug: uni.slug,
-                cost_description: uni.cost_description || '',
-                ielts_score: uni.ielts_score?.toString() || '',
-                flag_emoji: uni.flag_emoji || '',
-                scholarship_info: uni.scholarship_info || '',
-                description: uni.details_json?.description || '',
-                website: uni.details_json?.website || ''
-            })
-        }
-        setLoading(false)
-    }
+    }, [id, supabase, router])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()

@@ -103,7 +103,7 @@ export default function Footer() {
                             </li>
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-5 h-5 text-[var(--color-kz-gold)] mt-1" />
-                                <span>г. Алматы, пр. Абая 150,<br />БЦ "Алатау", офис 404</span>
+                                <span>г. Алматы, пр. Абая 150,<br />БЦ &quot;Алатау&quot;, офис 404</span>
                             </li>
                             <li><Link href="/about" className="text-gray-400 hover:text-white transition-colors">О нас</Link></li>
                             <li><Link href="/contacts" className="text-gray-400 hover:text-white transition-colors">Контакты</Link></li>

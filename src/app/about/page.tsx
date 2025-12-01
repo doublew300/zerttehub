@@ -1,4 +1,5 @@
 import { Users, Target, Globe } from 'lucide-react'
+import Image from 'next/image'
 
 export default function AboutPage() {
     return (
@@ -48,10 +49,11 @@ export default function AboutPage() {
                     {[1, 2, 3].map((i) => (
                         <div key={i} className="group">
                             <div className="w-32 h-32 mx-auto bg-gray-800 rounded-full mb-4 overflow-hidden border-2 border-white/10 group-hover:border-blue-500 transition-colors">
-                                <img
+                                <Image
                                     src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`}
                                     alt="Team member"
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    className="object-cover"
                                 />
                             </div>
                             <h4 className="font-bold text-lg">Участник {i}</h4>

@@ -7,8 +7,10 @@ import Link from 'next/link'
 import { Plus, Trash2, Edit, Search, Loader2, Building2, Users, FileText, GraduationCap } from 'lucide-react'
 import { motion } from 'framer-motion'
 
+import { University } from '@/types'
+
 export default function AdminPage() {
-    const [universities, setUniversities] = useState<any[]>([])
+    const [universities, setUniversities] = useState<University[]>([])
     const [stats, setStats] = useState({ totalUnis: 0, totalApps: 0, totalUsers: 0 })
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
@@ -16,57 +18,57 @@ export default function AdminPage() {
     const router = useRouter()
 
     useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { user }, error: authError } = await supabase.auth.getUser()
+            console.log('Admin Check - User:', user?.email, authError)
+
+            if (!user) {
+                console.log('Redirecting to /auth: No user')
+                router.push('/auth')
+                return
+            }
+
+            const { data: profile, error: profileError } = await supabase
+                .from('users')
+                .select('role')
+                .eq('id', user.id)
+                .single()
+
+            console.log('Admin Check - Profile:', profile, profileError)
+
+            if (profile?.role !== 'admin') {
+                console.log('Redirecting to /dashboard: Role is', profile?.role)
+                router.push('/dashboard')
+            }
+        }
+
+        const fetchData = async () => {
+            // Fetch Universities
+            const { data: unis } = await supabase
+                .from('universities')
+                .select('*')
+                .order('created_at', { ascending: false })
+
+            if (unis) {
+                setUniversities(unis)
+            }
+
+            // Fetch Stats
+            const { count: appsCount } = await supabase.from('applications').select('*', { count: 'exact', head: true })
+            const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true })
+
+            setStats({
+                totalUnis: unis?.length || 0,
+                totalApps: appsCount || 0,
+                totalUsers: usersCount || 0
+            })
+
+            setLoading(false)
+        }
+
         checkAdmin()
         fetchData()
-    }, [])
-
-    const checkAdmin = async () => {
-        const { data: { user }, error: authError } = await supabase.auth.getUser()
-        console.log('Admin Check - User:', user?.email, authError)
-
-        if (!user) {
-            console.log('Redirecting to /auth: No user')
-            router.push('/auth')
-            return
-        }
-
-        const { data: profile, error: profileError } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', user.id)
-            .single()
-
-        console.log('Admin Check - Profile:', profile, profileError)
-
-        if (profile?.role !== 'admin') {
-            console.log('Redirecting to /dashboard: Role is', profile?.role)
-            router.push('/dashboard')
-        }
-    }
-
-    const fetchData = async () => {
-        // Fetch Universities
-        const { data: unis } = await supabase
-            .from('universities')
-            .select('*')
-            .order('created_at', { ascending: false })
-
-        if (unis) {
-            setUniversities(unis)
-        }
-
-        // Fetch Stats (Mocking some for now if tables are restricted, but trying real counts)
-        const { count: appsCount } = await supabase.from('applications').select('*', { count: 'exact', head: true })
-        const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true })
-
-        setStats({
-            totalUnis: unis?.length || 0,
-            totalApps: appsCount || 0,
-            totalUsers: usersCount || 0
-        })
-
-        setLoading(false)
-    }
+    }, [supabase, router])
 
     const deleteUniversity = async (id: string) => {
         if (!confirm('Вы уверены, что хотите удалить этот университет?')) return

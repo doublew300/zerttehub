@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Plus, Trash2, Edit, Search, Loader2, FileText, ArrowLeft, CheckCircle, Lock, Unlock, Download } from 'lucide-react'
+import { Plus, Trash2, Edit, Search, Loader2, FileText, ArrowLeft, Lock, Unlock, Download } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export default function AdminResourcesPage() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [resources, setResources] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
@@ -15,39 +16,39 @@ export default function AdminResourcesPage() {
     const router = useRouter()
 
     useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) {
+                router.push('/auth')
+                return
+            }
+
+            const { data: profile } = await supabase
+                .from('users')
+                .select('role')
+                .eq('id', user.id)
+                .single()
+
+            if (profile?.role !== 'admin') {
+                router.push('/dashboard')
+            }
+        }
+
+        const fetchData = async () => {
+            const { data } = await supabase
+                .from('resources')
+                .select('*')
+                .order('created_at', { ascending: false })
+
+            if (data) {
+                setResources(data)
+            }
+            setLoading(false)
+        }
+
         checkAdmin()
         fetchData()
-    }, [])
-
-    const checkAdmin = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) {
-            router.push('/auth')
-            return
-        }
-
-        const { data: profile } = await supabase
-            .from('users')
-            .select('role')
-            .eq('id', user.id)
-            .single()
-
-        if (profile?.role !== 'admin') {
-            router.push('/dashboard')
-        }
-    }
-
-    const fetchData = async () => {
-        const { data } = await supabase
-            .from('resources')
-            .select('*')
-            .order('created_at', { ascending: false })
-
-        if (data) {
-            setResources(data)
-        }
-        setLoading(false)
-    }
+    }, [supabase, router])
 
     const deleteResource = async (id: string) => {
         if (!confirm('Вы уверены, что хотите удалить этот материал?')) return

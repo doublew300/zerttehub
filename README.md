@@ -32,14 +32,51 @@ This project leverages the latest and most efficient technologies in the ecosyst
 - **Icons**: [Lucide React](https://lucide.dev/) - For beautiful, consistent iconography.
 - **Animations**: [Framer Motion](https://www.framer.com/motion/) - For production-ready animations.
 
-## 🚀 Getting Started
+## 🏗️ System Architecture
 
-Follow these steps to set up the project locally:
+The application follows a modern, scalable architecture designed for performance and maintainability:
+
+-   **Frontend**: Next.js 15 (App Router) for server-side rendering and optimized client-side navigation.
+-   **Backend**: Serverless functions via Next.js API Routes, integrated with Supabase for backend-as-a-service (BaaS) capabilities.
+-   **Database**: PostgreSQL (via Supabase) with Row Level Security (RLS) for robust data protection.
+-   **AI Layer**: Vercel AI SDK orchestrating calls to Google Gemini, with context injection from the database for personalized responses.
+
+## 📂 Project Structure
+
+The codebase is organized to promote separation of concerns and scalability:
+
+```
+src/
+├── app/              # Next.js App Router pages and API endpoints
+│   ├── api/          # Backend logic (e.g., chat, auth)
+│   ├── dashboard/    # Protected user routes
+│   └── ...
+├── components/       # Reusable UI components
+│   ├── ui/           # Atomic design elements (buttons, inputs)
+│   └── ...
+├── lib/              # Core utilities and business logic
+│   ├── ai-context.ts # AI context retrieval and prompt engineering
+│   └── supabase.ts   # Database client configuration
+├── types/            # TypeScript interfaces and type definitions
+└── middleware.ts     # Edge middleware for authentication protection
+```
+
+## 🔐 Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file. See `.env.example` for a template.
+
+| Variable | Description |
+| :--- | :--- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anonymous public key |
+| `OPENAI_API_KEY` | API Key for AI services (Google Gemini configured via AI SDK) |
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- npm or yarn
+-   Node.js (v18 or higher)
+-   npm or yarn
 
 ### Installation
 
@@ -55,11 +92,9 @@ Follow these steps to set up the project locally:
     ```
 
 3.  **Environment Setup:**
-    Create a `.env.local` file in the root directory and add your Supabase and AI credentials:
-    ```env
-    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-    GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key
+    Copy the example environment file and fill in your credentials:
+    ```bash
+    cp .env.example .env.local
     ```
 
 4.  **Run the development server:**
@@ -69,6 +104,16 @@ Follow these steps to set up the project locally:
 
 5.  **Open the app:**
     Visit [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
 ## 👨‍💻 Developer
 

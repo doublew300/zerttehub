@@ -1,11 +1,11 @@
 import Link from 'next/link'
 
-import HeroSection from '@/components/HeroSection'
+import HeroSection from '@/components/sections/HeroSection'
 import UniversityCard from '@/components/UniversityCard'
-import BenefitsSection from '@/components/BenefitsSection'
-import RoadmapSection from '@/components/RoadmapSection'
-import TestimonialsSection from '@/components/TestimonialsSection'
-import FAQSection from '@/components/FAQSection'
+import BenefitsSection from '@/components/sections/BenefitsSection'
+import RoadmapSection from '@/components/sections/RoadmapSection'
+import TestimonialsSection from '@/components/sections/TestimonialsSection'
+import FAQSection from '@/components/sections/FAQSection'
 import { createClient } from '@/lib/supabase'
 
 

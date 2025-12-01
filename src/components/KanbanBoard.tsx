@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase'
 import { Loader2, Plus, Trash2, ExternalLink, ArrowRight, ArrowLeft, GraduationCap, BookOpen, Send, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import confetti from 'canvas-confetti'
 import { toast } from 'sonner'
 import { getCountryCode } from '@/lib/flags'
@@ -54,66 +55,67 @@ const COLUMNS = [
     },
 ]
 
+const triggerConfetti = () => {
+    const duration = 3000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+    const interval = setInterval(function () {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+            return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+    }, 250);
+}
+
 export default function KanbanBoard() {
     const [applications, setApplications] = useState<Application[]>([])
     const [loading, setLoading] = useState(true)
     const supabase = createClient()
 
     useEffect(() => {
-        fetchApplications()
-    }, [])
+        const fetchApplications = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) return
 
-    const fetchApplications = async () => {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
+            const { data, error } = await supabase
+                .from('applications')
+                .select(`
+                    *,
+                    university:universities (
+                        name,
+                        city,
+                        country,
+                        flag_emoji,
+                        slug
+                    )
+                `)
+                .eq('user_id', user.id)
 
-        const { data, error } = await supabase
-            .from('applications')
-            .select(`
-                *,
-                university:universities (
-                    name,
-                    city,
-                    country,
-                    flag_emoji,
-                    slug
-                )
-            `)
-            .eq('user_id', user.id)
-
-        if (error) {
-            console.error('Error fetching applications:', error)
-            toast.error('Не удалось загрузить заявки')
-        } else {
-            setApplications(data as any)
-        }
-        setLoading(false)
-    }
-
-    const triggerConfetti = () => {
-        const duration = 3000;
-        const animationEnd = Date.now() + duration;
-        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-        const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
-
-        const interval: any = setInterval(function () {
-            const timeLeft = animationEnd - Date.now();
-
-            if (timeLeft <= 0) {
-                return clearInterval(interval);
+            if (error) {
+                console.error('Error fetching applications:', error)
+                toast.error('Не удалось загрузить заявки')
+            } else {
+                setApplications(data as unknown as Application[])
             }
+            setLoading(false)
+        }
+        fetchApplications()
+    }, [supabase])
 
-            const particleCount = 50 * (timeLeft / duration);
-            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
-            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
-        }, 250);
-    }
+
 
     const updateStatus = async (id: string, newStatus: string) => {
         // Optimistic update
         setApplications(apps => apps.map(app =>
-            app.id === id ? { ...app, status: newStatus as any } : app
+            app.id === id ? { ...app, status: newStatus as Application['status'] } : app
         ))
 
         // Trigger confetti if accepted
@@ -130,7 +132,15 @@ export default function KanbanBoard() {
         if (error) {
             console.error('Error updating status:', error)
             toast.error('Не удалось обновить статус')
-            fetchApplications() // Revert on error
+            // Re-fetch to revert
+            const { data: { user } } = await supabase.auth.getUser()
+            if (user) {
+                const { data } = await supabase
+                    .from('applications')
+                    .select(`*, university:universities(*)`)
+                    .eq('user_id', user.id)
+                if (data) setApplications(data as unknown as Application[])
+            }
         }
     }
 
@@ -148,7 +158,15 @@ export default function KanbanBoard() {
         if (error) {
             console.error('Error deleting application:', error)
             toast.error('Не удалось удалить заявку')
-            fetchApplications() // Revert
+            // Re-fetch to revert
+            const { data: { user } } = await supabase.auth.getUser()
+            if (user) {
+                const { data } = await supabase
+                    .from('applications')
+                    .select(`*, university:universities(*)`)
+                    .eq('user_id', user.id)
+                if (data) setApplications(data as unknown as Application[])
+            }
         } else {
             toast.success('Заявка удалена')
         }
@@ -217,9 +235,11 @@ export default function KanbanBoard() {
                                                         {(() => {
                                                             const code = getCountryCode(app.university.country)
                                                             return code ? (
-                                                                <img
+                                                                <Image
                                                                     src={`https://flagcdn.com/w40/${code}.png`}
                                                                     alt={app.university.country}
+                                                                    width={40}
+                                                                    height={30}
                                                                     className="w-full h-auto rounded-sm"
                                                                 />
                                                             ) : (

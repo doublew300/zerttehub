@@ -1,6 +1,7 @@
+
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { MapPin, DollarSign, GraduationCap, Globe, CheckCircle, Lock, Plus } from 'lucide-react'
+import { DollarSign, GraduationCap, Globe, CheckCircle, Lock } from 'lucide-react'
 import { createClient } from '@/lib/supabase-server'
 import AddToWishlistButton from '@/components/AddToWishlistButton'
 
@@ -187,7 +188,6 @@ export default async function UniversityPage({ params }: { params: Promise<{ slu
 
                             <AddToWishlistButton
                                 universityId={university.id}
-                                universityName={university.name}
                                 className="w-full mt-8 bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 group hover:scale-105"
                             />
                         </div>

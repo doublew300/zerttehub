@@ -8,11 +8,10 @@ import { toast } from 'sonner'
 
 interface AddToWishlistButtonProps {
     universityId: string
-    universityName: string
     className?: string
 }
 
-export default function AddToWishlistButton({ universityId, universityName, className }: AddToWishlistButtonProps) {
+export default function AddToWishlistButton({ universityId, className }: AddToWishlistButtonProps) {
     const [loading, setLoading] = useState(false)
     const [isInWishlist, setIsInWishlist] = useState(false)
     const supabase = createClient()
