@@ -45,7 +45,7 @@ Follow these steps to set up the project locally:
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/YOUR_USERNAME/zerttehub.git
+    git clone https://github.com/doublew300/zerttehub.git
     cd zerttehub
     ```
 
